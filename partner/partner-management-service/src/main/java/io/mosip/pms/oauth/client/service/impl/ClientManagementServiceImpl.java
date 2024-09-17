@@ -623,7 +623,7 @@ public class ClientManagementServiceImpl implements ClientManagementService {
 	}
 
 	@Override
-	public ResponseWrapperV2<List<OidcClientDto>> getAllOidcClients() {
+	public ResponseWrapperV2<List<OidcClientDto>> getOidcClients() {
 		ResponseWrapperV2<List<OidcClientDto>> responseWrapper = new ResponseWrapperV2<>();
 		try {
 			String userId = getUserId();
@@ -668,8 +668,8 @@ public class ClientManagementServiceImpl implements ClientManagementService {
 					oidcClientDto.setPublicKey(clientDetail.getPublicKey());
 					oidcClientDto.setStatus(clientDetail.getStatus());
 					oidcClientDto.setGrantTypes(convertStringToList(clientDetail.getGrantTypes()));
-					oidcClientDto.setCrDtimes(clientDetail.getCreatedDateTime());
-					oidcClientDto.setUpdDtimes(clientDetail.getUpdatedDateTime());
+					oidcClientDto.setCreatedDateTime(clientDetail.getCreatedDateTime());
+					oidcClientDto.setUpdatedDateTime(clientDetail.getUpdatedDateTime());
 					oidcClientDto.setClientAuthMethods(convertStringToList(clientDetail.getClientAuthMethods()));
 					oidcClientDtoList.add(oidcClientDto);
 				}
@@ -678,12 +678,12 @@ public class ClientManagementServiceImpl implements ClientManagementService {
 		} catch (PartnerServiceException ex) {
 			LOGGER.debug("sessionId", "idType", "id", ex.getStackTrace());
 			LOGGER.error("sessionId", "idType", "id",
-					"In getAllOidcClients method of ClientManagementServiceImpl - " + ex.getMessage());
+					"In getOidcClients method of ClientManagementServiceImpl - " + ex.getMessage());
 			responseWrapper.setErrors(MultiPartnerUtil.setErrorResponse(ex.getErrorCode(), ex.getErrorText()));
 		} catch (Exception ex) {
 			LOGGER.debug("sessionId", "idType", "id", ex.getStackTrace());
 			LOGGER.error("sessionId", "idType", "id",
-					"In getAllOidcClients method of ClientManagementServiceImpl - " + ex.getMessage());
+					"In getOidcClients method of ClientManagementServiceImpl - " + ex.getMessage());
 			String errorCode = ErrorCode.OIDC_CLIENTS_FETCH_ERROR.getErrorCode();
 			String errorMessage = ErrorCode.OIDC_CLIENTS_FETCH_ERROR.getErrorMessage();
 			responseWrapper.setErrors(MultiPartnerUtil.setErrorResponse(errorCode, errorMessage));

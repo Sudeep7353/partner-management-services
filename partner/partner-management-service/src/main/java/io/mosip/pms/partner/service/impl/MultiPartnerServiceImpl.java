@@ -64,13 +64,13 @@ public class MultiPartnerServiceImpl implements MultiPartnerService {
     private String getAllRequestedPoliciesId;
 
     @Value("${mosip.pms.api.id.all.approved.partner.ids.with.policy.groups.get}")
-    private String getAllApprovedPartnerIdsWithPolicyGroupsId;
+    private String getApprovedPartnerIdsWithPolicyGroupsId;
 
     @Value("${mosip.pms.api.id.all.approved.auth.partners.policies.get}")
     private String getAllApprovedAuthPartnersPoliciesId;
 
     @Value("${mosip.pms.api.id.all.api.keys.for.auth.partners.get}")
-    private String getAllApiKeysForAuthPartnersId;
+    private String getApiKeysForAuthPartnersId;
 
     @Value("${mosip.pms.api.id.save.user.consent.given.post}")
     private String postSaveUserConsentGivenId;
@@ -130,7 +130,7 @@ public class MultiPartnerServiceImpl implements MultiPartnerService {
     PartnerHelper partnerHelper;
 
     @Override
-    public ResponseWrapperV2<List<CertificateDto>> getAllCertificateDetails() {
+    public ResponseWrapperV2<List<CertificateDto>> getPartnerCertificates() {
         ResponseWrapperV2<List<CertificateDto>> responseWrapper = new ResponseWrapperV2<>();
         try {
             String userId = getUserId();
@@ -151,9 +151,9 @@ public class MultiPartnerServiceImpl implements MultiPartnerService {
                         X509Certificate cert = MultiPartnerUtil.decodeCertificateData(partnerCertDownloadResponeDto.getCertificateData());
 
                         certificateDto.setIsCertificateAvailable(true);
-                        certificateDto.setCertificateName(getCertificateName(cert.getSubjectDN().getName()));
-                        certificateDto.setCertificateUploadDate(cert.getNotBefore());
-                        certificateDto.setCertificateExpiryDate(cert.getNotAfter());
+                        certificateDto.setCertificateIssuedTo(getCertificateName(cert.getSubjectDN().getName()));
+                        certificateDto.setCertificateUploadDateTime(cert.getNotBefore());
+                        certificateDto.setCertificateExpiryDateTime(cert.getNotAfter());
                         certificateDto.setPartnerId(partner.getId());
                         certificateDto.setPartnerType(partner.getPartnerTypeCode());
                     } catch (PartnerServiceException ex) {
@@ -171,12 +171,12 @@ public class MultiPartnerServiceImpl implements MultiPartnerService {
                         ErrorCode.USER_ID_NOT_EXISTS.getErrorMessage());
             }
         } catch (PartnerServiceException ex) {
-            LOGGER.info("sessionId", "idType", "id", "In getAllCertificateDetails method of MultiPartnerServiceImpl - " + ex.getMessage());
+            LOGGER.info("sessionId", "idType", "id", "In getPartnerCertificates method of MultiPartnerServiceImpl - " + ex.getMessage());
             responseWrapper.setErrors(MultiPartnerUtil.setErrorResponse(ex.getErrorCode(), ex.getErrorText()));
         } catch (Exception ex) {
             LOGGER.debug("sessionId", "idType", "id", ex.getStackTrace());
             LOGGER.error("sessionId", "idType", "id",
-                    "In getAllCertificateDetails method of MultiPartnerServiceImpl - " + ex.getMessage());
+                    "In getPartnerCertificates method of MultiPartnerServiceImpl - " + ex.getMessage());
             String errorCode = ErrorCode.PARTNER_CERTIFICATES_FETCH_ERROR.getErrorCode();
             String errorMessage = ErrorCode.PARTNER_CERTIFICATES_FETCH_ERROR.getErrorMessage();
             responseWrapper.setErrors(MultiPartnerUtil.setErrorResponse(errorCode, errorMessage));
@@ -187,7 +187,7 @@ public class MultiPartnerServiceImpl implements MultiPartnerService {
     }
 
     @Override
-    public ResponseWrapperV2<List<PolicyDto>> getAllRequestedPolicies() {
+    public ResponseWrapperV2<List<PolicyDto>> getPolicyRequests() {
         ResponseWrapperV2<List<PolicyDto>> responseWrapper = new ResponseWrapperV2<>();
         try {
             String userId = getUserId();
@@ -217,8 +217,8 @@ public class MultiPartnerServiceImpl implements MultiPartnerService {
                                     policyDto.setPolicyName(policyDetails.getName());
 
                                     policyDto.setPartnerComments(partnerPolicyRequest.getRequestDetail());
-                                    policyDto.setUpdDtimes(partnerPolicyRequest.getUpdDtimes());
-                                    policyDto.setCreateDate(partnerPolicyRequest.getCrDtimes());
+                                    policyDto.setUpdatedDateTime(partnerPolicyRequest.getUpdDtimes());
+                                    policyDto.setCreatedDateTime(partnerPolicyRequest.getCrDtimes());
                                     policyDto.setStatus(partnerPolicyRequest.getStatusCode());
                                     policyDtoList.add(policyDto);
                                 } else {
@@ -237,12 +237,12 @@ public class MultiPartnerServiceImpl implements MultiPartnerService {
                         ErrorCode.USER_ID_NOT_EXISTS.getErrorMessage());
             }
         } catch (PartnerServiceException ex) {
-            LOGGER.info("sessionId", "idType", "id", "In getAllPolicies method of MultiPartnerServiceImpl - " + ex.getMessage());
+            LOGGER.info("sessionId", "idType", "id", "In getPolicyRequests method of MultiPartnerServiceImpl - " + ex.getMessage());
             responseWrapper.setErrors(MultiPartnerUtil.setErrorResponse(ex.getErrorCode(), ex.getErrorText()));
         } catch (Exception ex) {
             LOGGER.debug("sessionId", "idType", "id", ex.getStackTrace());
             LOGGER.error("sessionId", "idType", "id",
-                    "In getAllPolicies method of MultiPartnerServiceImpl - " + ex.getMessage());
+                    "In getPolicyRequests method of MultiPartnerServiceImpl - " + ex.getMessage());
             String errorCode = ErrorCode.PARTNER_POLICY_FETCH_ERROR.getErrorCode();
             String errorMessage = ErrorCode.PARTNER_POLICY_FETCH_ERROR.getErrorMessage();
             responseWrapper.setErrors(MultiPartnerUtil.setErrorResponse(errorCode, errorMessage));
@@ -253,7 +253,7 @@ public class MultiPartnerServiceImpl implements MultiPartnerService {
     }
 
     @Override
-    public ResponseWrapperV2<List<PolicyGroupDto>> getAllApprovedPartnerIdsWithPolicyGroups() {
+    public ResponseWrapperV2<List<PolicyGroupDto>> getApprovedPartnerIdsWithPolicyGroups() {
         ResponseWrapperV2<List<PolicyGroupDto>> responseWrapper = new ResponseWrapperV2<>();
         try {
             String userId = getUserId();
@@ -284,7 +284,7 @@ public class MultiPartnerServiceImpl implements MultiPartnerService {
                         ErrorCode.USER_ID_NOT_EXISTS.getErrorMessage());
             }
         } catch (PartnerServiceException ex) {
-            LOGGER.info("sessionId", "idType", "id", "In getAllApprovedPolicyGroups method of MultiPartnerServiceImpl - " + ex.getMessage());
+            LOGGER.info("sessionId", "idType", "id", "In getApprovedPartnerIdsWithPolicyGroups method of MultiPartnerServiceImpl - " + ex.getMessage());
             responseWrapper.setErrors(MultiPartnerUtil.setErrorResponse(ex.getErrorCode(), ex.getErrorText()));
         } catch (Exception ex) {
             LOGGER.debug("sessionId", "idType", "id", ex.getStackTrace());
@@ -294,13 +294,13 @@ public class MultiPartnerServiceImpl implements MultiPartnerService {
             String errorMessage = ErrorCode.POLICY_GROUP_FETCH_ERROR.getErrorMessage();
             responseWrapper.setErrors(MultiPartnerUtil.setErrorResponse(errorCode, errorMessage));
         }
-        responseWrapper.setId(getAllApprovedPartnerIdsWithPolicyGroupsId);
+        responseWrapper.setId(getApprovedPartnerIdsWithPolicyGroupsId);
         responseWrapper.setVersion(VERSION);
         return responseWrapper;
     }
 
     @Override
-    public ResponseWrapperV2<List<ApprovedPolicyDto>> getAllApprovedAuthPartnerPolicies() {
+    public ResponseWrapperV2<List<ApprovedPolicyDto>> getAuthPartnersPolicies() {
         ResponseWrapperV2<List<ApprovedPolicyDto>> responseWrapper = new ResponseWrapperV2<>();
         try {
             String userId = getUserId();
@@ -314,7 +314,6 @@ public class MultiPartnerServiceImpl implements MultiPartnerService {
                         PolicyGroup policyGroup = validatePolicyGroup(partner);
                         ApprovedPolicyDto approvedPolicyDto = new ApprovedPolicyDto();
                         approvedPolicyDto.setPartnerId(partner.getId());
-                        approvedPolicyDto.setPartnerType(partner.getPartnerTypeCode());
                         approvedPolicyDto.setPolicyGroupId(policyGroup.getId());
                         approvedPolicyDto.setPolicyGroupDescription(policyGroup.getDesc());
                         approvedPolicyDto.setPolicyGroupName(policyGroup.getName());
@@ -329,7 +328,6 @@ public class MultiPartnerServiceImpl implements MultiPartnerService {
                                         activePolicyDto.setPolicyId(policyDetails.getId());
                                         activePolicyDto.setPolicyDescription(policyDetails.getDescr());
                                         activePolicyDto.setPolicyName(policyDetails.getName());
-                                        activePolicyDto.setStatus(partnerPolicyRequest.getStatusCode());
                                         activePolicyDtoList.add(activePolicyDto);
                                     } else {
                                         LOGGER.info("No matching policy not found for policy group ID :" + partner.getPolicyGroupId() + "and Policy ID :" + partnerPolicyRequest.getPolicyId());
@@ -353,12 +351,12 @@ public class MultiPartnerServiceImpl implements MultiPartnerService {
                         ErrorCode.USER_ID_NOT_EXISTS.getErrorMessage());
             }
         } catch (PartnerServiceException ex) {
-            LOGGER.info("sessionId", "idType", "id", "In getAllPolicies method of MultiPartnerServiceImpl - " + ex.getMessage());
+            LOGGER.info("sessionId", "idType", "id", "In getAuthPartnersPolicies method of MultiPartnerServiceImpl - " + ex.getMessage());
             responseWrapper.setErrors(MultiPartnerUtil.setErrorResponse(ex.getErrorCode(), ex.getErrorText()));
         } catch (Exception ex) {
             LOGGER.debug("sessionId", "idType", "id", ex.getStackTrace());
             LOGGER.error("sessionId", "idType", "id",
-                    "In getAllPolicies method of MultiPartnerServiceImpl - " + ex.getMessage());
+                    "In getAuthPartnersPolicies method of MultiPartnerServiceImpl - " + ex.getMessage());
             String errorCode = ErrorCode.PARTNER_POLICY_FETCH_ERROR.getErrorCode();
             String errorMessage = ErrorCode.PARTNER_POLICY_FETCH_ERROR.getErrorMessage();
             responseWrapper.setErrors(MultiPartnerUtil.setErrorResponse(errorCode, errorMessage));
@@ -430,7 +428,7 @@ public class MultiPartnerServiceImpl implements MultiPartnerService {
     }
 
     @Override
-    public ResponseWrapperV2<List<ApiKeyResponseDto>> getAllApiKeysForAuthPartners() {
+    public ResponseWrapperV2<List<ApiKeyResponseDto>> getApiKeysForAuthPartners() {
         ResponseWrapperV2<List<ApiKeyResponseDto>> responseWrapper = new ResponseWrapperV2<>();
         try {
             String userId = getUserId();
@@ -469,9 +467,8 @@ public class MultiPartnerServiceImpl implements MultiPartnerService {
                                 apiKeyResponseDto.setPolicyGroupDescription(policyGroup.getDesc());
                                 apiKeyResponseDto.setPolicyId(authPolicy.get().getId());
                                 apiKeyResponseDto.setPolicyName(authPolicy.get().getName());
-                                apiKeyResponseDto.setPolicyNameDescription(authPolicy.get().getDescr());
-                                apiKeyResponseDto.setCrDtimes(partnerPolicy.getCrDtimes());
-                                apiKeyResponseDto.setUpdDtimes(partnerPolicy.getUpdDtimes());
+                                apiKeyResponseDto.setPolicyDescription(authPolicy.get().getDescr());
+                                apiKeyResponseDto.setCreatedDateTime(partnerPolicy.getCrDtimes());
                                 apiKeyResponseDtoList.add(apiKeyResponseDto);
                             }
                         }
@@ -484,17 +481,17 @@ public class MultiPartnerServiceImpl implements MultiPartnerService {
                         ErrorCode.USER_ID_NOT_EXISTS.getErrorMessage());
             }
         } catch (PartnerServiceException ex) {
-            LOGGER.info("sessionId", "idType", "id", "In getAllApiKeysForAuthPartners method of MultiPartnerServiceImpl - " + ex.getMessage());
+            LOGGER.info("sessionId", "idType", "id", "In getApiKeysForAuthPartners method of MultiPartnerServiceImpl - " + ex.getMessage());
             responseWrapper.setErrors(MultiPartnerUtil.setErrorResponse(ex.getErrorCode(), ex.getErrorText()));
         } catch (Exception ex) {
             LOGGER.debug("sessionId", "idType", "id", ex.getStackTrace());
             LOGGER.error("sessionId", "idType", "id",
-                    "In getAllApiKeysForAuthPartners method of MultiPartnerServiceImpl - " + ex.getMessage());
+                    "In getApiKeysForAuthPartners method of MultiPartnerServiceImpl - " + ex.getMessage());
             String errorCode = ErrorCode.API_KEY_REQUESTS_FETCH_ERROR.getErrorCode();
             String errorMessage = ErrorCode.API_KEY_REQUESTS_FETCH_ERROR.getErrorMessage();
             responseWrapper.setErrors(MultiPartnerUtil.setErrorResponse(errorCode, errorMessage));
         }
-        responseWrapper.setId(getAllApiKeysForAuthPartnersId);
+        responseWrapper.setId(getApiKeysForAuthPartnersId);
         responseWrapper.setVersion(VERSION);
         return responseWrapper;
     }
@@ -505,7 +502,7 @@ public class MultiPartnerServiceImpl implements MultiPartnerService {
     }
 
     @Override
-    public ResponseWrapperV2<UserDetailsDto> saveUserConsentGiven() {
+    public ResponseWrapperV2<UserDetailsDto> saveUserConsent() {
         ResponseWrapperV2<UserDetailsDto> responseWrapper = new ResponseWrapperV2<>();
         try {
             String userId = getUserId();
@@ -538,7 +535,7 @@ public class MultiPartnerServiceImpl implements MultiPartnerService {
                 UserDetailsDto userDetailsDto = new UserDetailsDto();
                 userDetailsDto.setConsentGiven(true);
                 userDetailsDto.setUserId(respEntity.getUserId());
-                userDetailsDto.setConsentGivenDtimes(respEntity.getConsentGivenDtimes());
+                userDetailsDto.setConsentGivenDateTime(respEntity.getConsentGivenDtimes());
 
                 responseWrapper.setResponse(userDetailsDto);
             } else {
@@ -576,7 +573,7 @@ public class MultiPartnerServiceImpl implements MultiPartnerService {
                     UserDetails entity = optionalEntity.get();
                     if (entity.getConsentGiven().equals(YES)) {
                         userDetailsDto.setConsentGiven(true);
-                        userDetailsDto.setConsentGivenDtimes(entity.getConsentGivenDtimes());
+                        userDetailsDto.setConsentGivenDateTime(entity.getConsentGivenDtimes());
                     }
                 }
                 responseWrapper.setResponse(userDetailsDto);

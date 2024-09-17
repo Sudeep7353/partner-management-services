@@ -17,6 +17,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import io.mosip.pms.common.response.dto.ResponseWrapperV2;
+import io.mosip.pms.policy.dto.*;
 import org.apache.commons.io.IOUtils;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -63,24 +64,6 @@ import io.mosip.pms.common.util.MapperUtils;
 import io.mosip.pms.common.util.PMSLogger;
 import io.mosip.pms.common.util.PageUtils;
 import io.mosip.pms.common.validator.FilterColumnValidator;
-import io.mosip.pms.policy.dto.ColumnCodeValue;
-import io.mosip.pms.policy.dto.FilterResponseCodeDto;
-import io.mosip.pms.policy.dto.KeyValuePair;
-import io.mosip.pms.policy.dto.PartnerPolicySearchDto;
-import io.mosip.pms.policy.dto.PolicyCreateRequestDto;
-import io.mosip.pms.policy.dto.PolicyCreateResponseDto;
-import io.mosip.pms.policy.dto.PolicyDetailsDto;
-import io.mosip.pms.policy.dto.PolicyDto;
-import io.mosip.pms.policy.dto.PolicyGroupCreateRequestDto;
-import io.mosip.pms.policy.dto.PolicyGroupCreateResponseDto;
-import io.mosip.pms.policy.dto.PolicyGroupUpdateRequestDto;
-import io.mosip.pms.policy.dto.PolicyManageEnum;
-import io.mosip.pms.policy.dto.PolicyResponseDto;
-import io.mosip.pms.policy.dto.PolicyStatusUpdateRequestDto;
-import io.mosip.pms.policy.dto.PolicyStatusUpdateResponseDto;
-import io.mosip.pms.policy.dto.PolicyUpdateRequestDto;
-import io.mosip.pms.policy.dto.PolicyWithAuthPolicyDto;
-import io.mosip.pms.policy.dto.ResponseWrapper;
 import io.mosip.pms.policy.errorMessages.ErrorMessages;
 import io.mosip.pms.policy.errorMessages.PolicyManagementServiceException;
 import io.mosip.pms.policy.util.AuditUtil;
@@ -1055,8 +1038,8 @@ public class PolicyManagementService {
 
 	}
 
-	public ResponseWrapperV2<List<PolicyGroup>> getAllPolicyGroups() {
-		ResponseWrapperV2<List<PolicyGroup>> responseWrapper = new ResponseWrapperV2<>();
+	public ResponseWrapperV2<List<PolicyGroupDto>> getPolicyGroups() {
+		ResponseWrapperV2<List<PolicyGroupDto>> responseWrapper = new ResponseWrapperV2<>();
 		try {
 			List<PolicyGroup> policyGroupsList;
 			policyGroupsList = policyGroupRepository.findAllActivePolicyGroups();
@@ -1065,7 +1048,19 @@ public class PolicyManagementService {
 				throw new PolicyManagementServiceException(ErrorMessages.POLICY_GROUPS_NOT_AVAILABLE.getErrorCode(),
 						ErrorMessages.POLICY_GROUPS_NOT_AVAILABLE.getErrorMessage());
 			}
-			responseWrapper.setResponse(policyGroupsList);
+			List<PolicyGroupDto> policyGroupDtoList = new ArrayList<>();
+			for (PolicyGroup policyGroup : policyGroupsList) {
+				PolicyGroupDto policyGroupDto = new PolicyGroupDto();
+				policyGroupDto.setId(policyGroup.getId());
+				policyGroupDto.setDescription(policyGroup.getDesc());
+				policyGroupDto.setName(policyGroup.getName());
+				policyGroupDto.setIsActive(policyGroup.getIsActive());
+				policyGroupDto.setUpdBy(policyGroup.getUpdBy());
+				policyGroupDto.setUpdDtimes(policyGroup.getUpdDtimes());
+
+				policyGroupDtoList.add(policyGroupDto);
+			}
+			responseWrapper.setResponse(policyGroupDtoList);
 		} catch (PolicyManagementServiceException ex) {
 			logger.info("sessionId", "idType", "id", "In getAllPolicyGroups method of PolicyManagementService - " + ex.getMessage());
 			responseWrapper.setErrors(PolicyUtil.setErrorResponse(ex.getErrorCode(), ex.getErrorText()));
