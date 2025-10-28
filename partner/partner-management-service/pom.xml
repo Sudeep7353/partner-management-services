@@ -100,7 +100,6 @@
 				<configuration>
 					<layout>ZIP</layout>
 					<executable>true</executable>
-					<skip>false</skip>
 				</configuration>
 				<executions>
 					<execution>
@@ -109,7 +108,8 @@
 							<goal>repackage</goal>
 						</goals>
 						<configuration>
-							<attach>false</attach>
+							<!-- Keep original non-executable jar -->
+							<classifier>original</classifier>
 						</configuration>
 					</execution>
 				</executions>
